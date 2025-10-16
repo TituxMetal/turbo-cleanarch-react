@@ -1,0 +1,5 @@
+.claude/
+.cursor/
+.github/
+pnpm-*.yaml
+prettier.config.cjs

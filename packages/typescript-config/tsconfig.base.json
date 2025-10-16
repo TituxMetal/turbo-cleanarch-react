@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@repo/tsconfig": ["packages/typescript-config"],
+      "@repo/tsconfig/*": ["packages/typescript-config/*"],
+      "@repo/eslint-config": ["packages/eslint-config/src"],
+      "@repo/eslint-config/*": ["packages/eslint-config/src/*"]
+    }
+  },
+  "references": [
+    { "path": "./apps/api" },
+    { "path": "./apps/web" },
+    { "path": "./packages/typescript-config" },
+    { "path": "./packages/eslint-config" }
+  ],
+  "files": [],
+  "include": [],
+  "exclude": ["node_modules", "dist", "coverage", ".turbo"]
+}
