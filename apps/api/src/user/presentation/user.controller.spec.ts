@@ -84,7 +84,9 @@ describe('UserController', () => {
       const createUserDto = { name: 'John Doe', email: 'john@example.com' }
       createUserUseCase.execute.mockResolvedValue(null)
 
-      await expect(controller.createUser(createUserDto)).rejects.toThrow('User creation failed')
+      await expect(controller.createUser(createUserDto)).rejects.toThrow(
+        'Unexpected null user returned from create operation'
+      )
     })
 
     it('should propagate ConflictException', async () => {
