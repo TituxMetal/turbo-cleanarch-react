@@ -5,6 +5,7 @@
     "target": "ES2017",
     "declaration": true,
     "removeComments": true,
+    "isolatedModules": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "verbatimModuleSyntax": false,

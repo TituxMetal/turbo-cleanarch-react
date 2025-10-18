@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rm -rf .turbo",
-    "reset": "pnpm clean && rm -rf node_modules && pnpm install"
+    "reset": "pnpm clean && rm -rf node_modules && pnpm install",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch"
   },
   "devDependencies": {
     "@types/node": "~22.18.10",
