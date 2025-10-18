@@ -7,7 +7,7 @@ import { GetUserUseCase } from './application/use-cases/getUser.uc'
 import { ListUsersUseCase } from './application/use-cases/listUsers.us'
 import { UpdateUserUseCase } from './application/use-cases/updateUser.uc'
 import { InMemoryUserRepository } from './infrastructure/adapters/inMemoryUser.repository'
-import { UserController } from './presentaton/user.controller'
+import { UserController } from './presentation/user.controller'
 
 @Module({
   controllers: [UserController],

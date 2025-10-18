@@ -143,15 +143,14 @@ describe('UpdateUserUseCase', () => {
       )
     })
 
-    it('should ignore empty email and not update', async () => {
+    it('should throw error for empty email', async () => {
       const user = UserEntity.create('John Doe', 'john@example.com')
       await userRepository.save(user)
       const userId = user.getId().getValue()
-      const originalEmail = user.getEmail().getValue()
 
-      const result = await updateUserUseCase.execute({ email: '' }, userId)
-
-      expect(result.getEmail().getValue()).toBe(originalEmail)
+      await expect(updateUserUseCase.execute({ email: '' }, userId)).rejects.toThrow(
+        'Invalid email format'
+      )
     })
 
     it('should throw error for name shorter than 2 characters when updating', async () => {
@@ -164,15 +163,14 @@ describe('UpdateUserUseCase', () => {
       )
     })
 
-    it('should ignore empty name and not update', async () => {
+    it('should throw error for empty name', async () => {
       const user = UserEntity.create('John Doe', 'john@example.com')
       await userRepository.save(user)
       const userId = user.getId().getValue()
-      const originalName = user.getName()
 
-      const result = await updateUserUseCase.execute({ name: '' }, userId)
-
-      expect(result.getName()).toBe(originalName)
+      await expect(updateUserUseCase.execute({ name: '' }, userId)).rejects.toThrow(
+        'Name must be at least 2 characters long'
+      )
     })
   })
 

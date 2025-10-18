@@ -21,11 +21,11 @@ export class UpdateUserUseCase {
       throw new NotFoundException('User not found')
     }
 
-    if (dto.name) {
+    if (dto.name !== undefined) {
       user.updateName(dto.name)
     }
 
-    if (dto.email) {
+    if (dto.email !== undefined) {
       user.updateEmail(dto.email)
     }
 

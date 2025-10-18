@@ -20,7 +20,7 @@ export class UserController {
     const user = await this.createUserUseCase.execute(request)
 
     if (!user) {
-      throw new Error('User creation failed')
+      throw new Error('Unexpected null user returned from create operation')
     }
 
     return this.mapToResponse(user)
