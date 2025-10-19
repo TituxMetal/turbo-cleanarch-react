@@ -188,7 +188,7 @@ describe('UpdateTaskUseCase', () => {
       await taskRepository.save(task)
       const taskId = task.getId().getValue()
       const saveSpy = jest.spyOn(taskRepository, 'save')
-      saveSpy.mockClear() // Clear the save from beforeEach
+      saveSpy.mockClear()
 
       await expect(updateTaskUseCase.execute(taskId, { title: '' })).rejects.toThrow()
 
