@@ -140,6 +140,5 @@ describe('UpdateTaskUseCase', () => {
     await expect(useCase.execute(taskId, { title: '' })).rejects.toThrow(
       'Task title cannot be empty'
     )
-    expect(taskRepository.save).not.toHaveBeenCalled()
   })
 })

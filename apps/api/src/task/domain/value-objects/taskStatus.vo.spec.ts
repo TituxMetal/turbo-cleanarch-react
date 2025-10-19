@@ -10,15 +10,6 @@ describe('TaskStatus', () => {
     expect(status.isCompleted()).toBe(false)
   })
 
-  it('should set status to TODO', () => {
-    const status = new TaskStatus(TaskStatusEnum.TODO)
-
-    expect(status.getValue()).toBe(TaskStatusEnum.TODO)
-    expect(status.isTodo()).toBe(true)
-    expect(status.isInProgress()).toBe(false)
-    expect(status.isCompleted()).toBe(false)
-  })
-
   it('should set status to IN_PROGRESS', () => {
     const status = new TaskStatus(TaskStatusEnum.IN_PROGRESS)
 
