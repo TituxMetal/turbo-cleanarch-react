@@ -18,6 +18,7 @@ import { UserController } from './presentation/user.controller'
     UpdateUserUseCase,
     DeleteUserUseCase,
     { provide: USER_REPOSITORY, useClass: InMemoryUserRepository }
-  ]
+  ],
+  exports: [USER_REPOSITORY]
 })
 export class UserModule {}
