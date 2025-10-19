@@ -1,3 +1,5 @@
+import { NotFoundException } from '@nestjs/common'
+
 import { UserRepositoryPort } from '~/user/application/ports/user.repository'
 import { UserEntity } from '~/user/domain/entities/user.entity'
 import { InMemoryUserRepository } from '~/user/infrastructure/adapters/inMemoryUser.repository'
@@ -25,10 +27,20 @@ describe('DeleteUserUseCase', () => {
       expect(deletedUser).toBeNull()
     })
 
-    it('should not throw error when deleting non-existent user', async () => {
+    it('should throw NotFoundException when user does not exist', async () => {
       const nonExistentId = 'non-existent-id'
 
-      await expect(deleteUserUseCase.execute(nonExistentId)).resolves.not.toThrow()
+      await expect(deleteUserUseCase.execute(nonExistentId)).rejects.toThrow(NotFoundException)
+      await expect(deleteUserUseCase.execute(nonExistentId)).rejects.toThrow('User not found')
+    })
+
+    it('should not call repository delete when user not found', async () => {
+      const nonExistentId = 'non-existent-id'
+      const deleteSpy = jest.spyOn(userRepository, 'delete')
+
+      await expect(deleteUserUseCase.execute(nonExistentId)).rejects.toThrow(NotFoundException)
+
+      expect(deleteSpy).not.toHaveBeenCalled()
     })
 
     it('should call repository delete with correct ID', async () => {
@@ -74,11 +86,11 @@ describe('DeleteUserUseCase', () => {
       expect(remainingUsers[0].getId().getValue()).toBe(user2.getId().getValue())
     })
 
-    it('should handle deletion from empty repository', async () => {
+    it('should throw NotFoundException when deleting from empty repository', async () => {
       const allUsersBefore = await userRepository.findAll()
       expect(allUsersBefore).toHaveLength(0)
 
-      await deleteUserUseCase.execute('any-id')
+      await expect(deleteUserUseCase.execute('any-id')).rejects.toThrow(NotFoundException)
 
       const allUsersAfter = await userRepository.findAll()
       expect(allUsersAfter).toHaveLength(0)
@@ -114,10 +126,11 @@ describe('DeleteUserUseCase', () => {
   })
 
   describe('error handling', () => {
-    it('should propagate repository delete errors', async () => {
+    it('should propagate repository findById errors', async () => {
       const errorMessage = 'Repository operation failed'
       const mockRepository = {
-        delete: jest.fn().mockRejectedValue(new Error(errorMessage))
+        findById: jest.fn().mockRejectedValue(new Error(errorMessage)),
+        delete: jest.fn()
       } as unknown as UserRepositoryPort
 
       const useCase = new DeleteUserUseCase(mockRepository)
@@ -125,14 +138,20 @@ describe('DeleteUserUseCase', () => {
       await expect(useCase.execute('any-id')).rejects.toThrow(errorMessage)
     })
 
-    it('should handle repository delete returning undefined', async () => {
+    it('should propagate repository delete errors', async () => {
+      const user = UserEntity.create('John Doe', 'john@example.com')
+      await userRepository.save(user)
+      const userId = user.getId().getValue()
+
+      const errorMessage = 'Delete operation failed'
       const mockRepository = {
-        delete: jest.fn().mockResolvedValue(undefined)
+        findById: jest.fn().mockResolvedValue(user),
+        delete: jest.fn().mockRejectedValue(new Error(errorMessage))
       } as unknown as UserRepositoryPort
 
       const useCase = new DeleteUserUseCase(mockRepository)
 
-      await expect(useCase.execute('any-id')).resolves.not.toThrow()
+      await expect(useCase.execute(userId)).rejects.toThrow(errorMessage)
     })
   })
 })

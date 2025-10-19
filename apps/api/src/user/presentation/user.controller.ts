@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 
 import { CreateUserDto, CreateUserUseCase } from '~/user/application/use-cases/createUser.uc'
+import { DeleteUserUseCase } from '~/user/application/use-cases/deleteUser.uc'
 import { GetUserUseCase } from '~/user/application/use-cases/getUser.uc'
 import { ListUsersUseCase } from '~/user/application/use-cases/listUsers.uc'
 import { UpdateUserDto, UpdateUserUseCase } from '~/user/application/use-cases/updateUser.uc'
@@ -12,7 +13,8 @@ export class UserController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly getUserUseCase: GetUserUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
-    private readonly updateUserUseCase: UpdateUserUseCase
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase
   ) {}
 
   @Post()
@@ -45,6 +47,12 @@ export class UserController {
     const user = await this.updateUserUseCase.execute(request, id)
 
     return this.mapToResponse(user)
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    await this.deleteUserUseCase.execute(id)
+    return { message: 'User deleted successfully' }
   }
 
   private mapToResponse(user: UserEntity) {

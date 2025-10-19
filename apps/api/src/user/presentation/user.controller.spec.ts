@@ -2,6 +2,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 
 import { CreateUserUseCase } from '~/user/application/use-cases/createUser.uc'
+import { DeleteUserUseCase } from '~/user/application/use-cases/deleteUser.uc'
 import { GetUserUseCase } from '~/user/application/use-cases/getUser.uc'
 import { ListUsersUseCase } from '~/user/application/use-cases/listUsers.uc'
 import { UpdateUserUseCase } from '~/user/application/use-cases/updateUser.uc'
@@ -15,6 +16,7 @@ describe('UserController', () => {
   let getUserUseCase: jest.Mocked<GetUserUseCase>
   let listUsersUseCase: jest.Mocked<ListUsersUseCase>
   let updateUserUseCase: jest.Mocked<UpdateUserUseCase>
+  let deleteUserUseCase: jest.Mocked<DeleteUserUseCase>
 
   beforeEach(async () => {
     const mockCreateUserUseCase = {
@@ -27,6 +29,9 @@ describe('UserController', () => {
       execute: jest.fn()
     }
     const mockUpdateUserUseCase = {
+      execute: jest.fn()
+    }
+    const mockDeleteUserUseCase = {
       execute: jest.fn()
     }
 
@@ -48,6 +53,10 @@ describe('UserController', () => {
         {
           provide: UpdateUserUseCase,
           useValue: mockUpdateUserUseCase
+        },
+        {
+          provide: DeleteUserUseCase,
+          useValue: mockDeleteUserUseCase
         }
       ]
     }).compile()
@@ -57,6 +66,7 @@ describe('UserController', () => {
     getUserUseCase = module.get(GetUserUseCase)
     listUsersUseCase = module.get(ListUsersUseCase)
     updateUserUseCase = module.get(UpdateUserUseCase)
+    deleteUserUseCase = module.get(DeleteUserUseCase)
   })
 
   describe('createUser', () => {
@@ -243,6 +253,36 @@ describe('UserController', () => {
       await expect(controller.updateUser(userId, updateUserDto)).rejects.toThrow(
         'Invalid email format'
       )
+    })
+  })
+
+  describe('deleteUser', () => {
+    it('should delete a user successfully', async () => {
+      const userId = 'user-id-123'
+      deleteUserUseCase.execute.mockResolvedValue(undefined)
+
+      const result = await controller.deleteUser(userId)
+
+      expect(deleteUserUseCase.execute).toHaveBeenCalledWith(userId)
+      expect(result).toEqual({ message: 'User deleted successfully' })
+    })
+
+    it('should propagate NotFoundException when user not found', async () => {
+      const userId = 'non-existent-id'
+      deleteUserUseCase.execute.mockRejectedValue(new NotFoundException('User not found'))
+
+      await expect(controller.deleteUser(userId)).rejects.toThrow(NotFoundException)
+      await expect(controller.deleteUser(userId)).rejects.toThrow('User not found')
+    })
+
+    it('should call deleteUserUseCase with correct id', async () => {
+      const userId = 'user-id-456'
+      deleteUserUseCase.execute.mockResolvedValue(undefined)
+
+      await controller.deleteUser(userId)
+
+      expect(deleteUserUseCase.execute).toHaveBeenCalledTimes(1)
+      expect(deleteUserUseCase.execute).toHaveBeenCalledWith(userId)
     })
   })
 })
