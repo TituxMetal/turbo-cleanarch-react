@@ -1,6 +1,6 @@
-import { ListTasksUseCase } from './listTasks.uc'
 import { TaskRepositoryPort } from '~/task/application/ports/task.repository'
 import { TaskEntity } from '~/task/domain/entities/task.entity'
+import { ListTasksUseCase } from './listTasks.uc'
 
 describe('ListTasksUseCase', () => {
   let useCase: ListTasksUseCase
@@ -23,8 +23,9 @@ describe('ListTasksUseCase', () => {
       TaskEntity.create('Task 1', 'Description 1', 'user-1'),
       TaskEntity.create('Task 2', 'Description 2', 'user-2')
     ]
+    const mockFindAll = taskRepository.findAll as jest.Mock
 
-    ;(taskRepository.findAll as jest.Mock).mockResolvedValue(tasks)
+    mockFindAll.mockResolvedValue(tasks)
 
     const result = await useCase.execute()
 
@@ -40,8 +41,9 @@ describe('ListTasksUseCase', () => {
       TaskEntity.create('Task 1', 'Description 1', userId),
       TaskEntity.create('Task 2', 'Description 2', userId)
     ]
+    const mockFindByUserId = taskRepository.findByUserId as jest.Mock
 
-    ;(taskRepository.findByUserId as jest.Mock).mockResolvedValue(tasks)
+    mockFindByUserId.mockResolvedValue(tasks)
 
     const result = await useCase.execute(userId)
 
@@ -52,7 +54,9 @@ describe('ListTasksUseCase', () => {
   })
 
   it('should return empty array when no tasks exist', async () => {
-    ;(taskRepository.findAll as jest.Mock).mockResolvedValue([])
+    const mockFindAll = taskRepository.findAll as jest.Mock
+
+    mockFindAll.mockResolvedValue([])
 
     const result = await useCase.execute()
 
@@ -61,8 +65,9 @@ describe('ListTasksUseCase', () => {
 
   it('should return empty array when user has no tasks', async () => {
     const userId = 'user-with-no-tasks'
+    const mockFindByUserId = taskRepository.findByUserId as jest.Mock
 
-    ;(taskRepository.findByUserId as jest.Mock).mockResolvedValue([])
+    mockFindByUserId.mockResolvedValue([])
 
     const result = await useCase.execute(userId)
 

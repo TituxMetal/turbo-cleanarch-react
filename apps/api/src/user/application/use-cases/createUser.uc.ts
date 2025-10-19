@@ -19,7 +19,7 @@ export class CreateUserUseCase {
     const existingUser = await this.userRepository.findByEmail(dto.email)
 
     if (existingUser) {
-      throw new ConflictException('User with this email already exists')
+      throw new ConflictException('User with this email already exists', 'USER_ALREADY_EXISTS')
     }
 
     const user = UserEntity.create(dto.name, dto.email)

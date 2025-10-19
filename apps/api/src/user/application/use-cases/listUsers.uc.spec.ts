@@ -2,7 +2,7 @@ import { UserRepositoryPort } from '~/user/application/ports/user.repository'
 import { UserEntity } from '~/user/domain/entities/user.entity'
 import { InMemoryUserRepository } from '~/user/infrastructure/adapters/inMemoryUser.repository'
 
-import { ListUsersUseCase } from './listUsers.us'
+import { ListUsersUseCase } from './listUsers.uc'
 
 describe('ListUsersUseCase', () => {
   let listUsersUseCase: ListUsersUseCase

@@ -2,7 +2,7 @@ import { UserRepositoryPort } from '~/user/application/ports/user.repository'
 import { UserEntity } from '~/user/domain/entities/user.entity'
 import { InMemoryUserRepository } from '~/user/infrastructure/adapters/inMemoryUser.repository'
 
-import { DeleteUserUseCase } from './deleteUser.us'
+import { DeleteUserUseCase } from './deleteUser.uc'
 
 describe('DeleteUserUseCase', () => {
   let deleteUserUseCase: DeleteUserUseCase

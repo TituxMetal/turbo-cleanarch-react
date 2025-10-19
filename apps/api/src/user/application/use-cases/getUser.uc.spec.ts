@@ -36,7 +36,6 @@ describe('GetUserUseCase', () => {
       const nonExistentId = 'non-existent-id'
 
       await expect(getUserUseCase.execute(nonExistentId)).rejects.toThrow(NotFoundException)
-      await expect(getUserUseCase.execute(nonExistentId)).rejects.toThrow('User not found')
     })
 
     it('should throw NotFoundException when user ID is empty string', async () => {

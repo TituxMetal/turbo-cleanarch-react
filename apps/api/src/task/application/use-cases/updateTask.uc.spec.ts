@@ -1,8 +1,8 @@
 import { NotFoundException } from '@nestjs/common'
-import { UpdateTaskUseCase } from './updateTask.uc'
 import { TaskRepositoryPort } from '~/task/application/ports/task.repository'
 import { TaskEntity } from '~/task/domain/entities/task.entity'
 import { TaskStatusEnum } from '~/task/domain/value-objects/taskStatus.vo'
+import { UpdateTaskUseCase } from './updateTask.uc'
 
 describe('UpdateTaskUseCase', () => {
   let useCase: UpdateTaskUseCase
@@ -23,9 +23,11 @@ describe('UpdateTaskUseCase', () => {
   it('should update task title', async () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Old Title', 'Description', 'user-123')
+    const mockFindById = taskRepository.findById as jest.Mock
+    const mockSave = taskRepository.save as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
-    ;(taskRepository.save as jest.Mock).mockImplementation((t: TaskEntity) => t)
+    mockFindById.mockResolvedValue(task)
+    mockSave.mockImplementation((t: TaskEntity) => t)
 
     const result = await useCase.execute(taskId, { title: 'New Title' })
 
@@ -36,9 +38,11 @@ describe('UpdateTaskUseCase', () => {
   it('should update task description', async () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Title', 'Old Description', 'user-123')
+    const mockFindById = taskRepository.findById as jest.Mock
+    const mockSave = taskRepository.save as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
-    ;(taskRepository.save as jest.Mock).mockImplementation((t: TaskEntity) => t)
+    mockFindById.mockResolvedValue(task)
+    mockSave.mockImplementation((t: TaskEntity) => t)
 
     const result = await useCase.execute(taskId, { description: 'New Description' })
 
@@ -49,9 +53,11 @@ describe('UpdateTaskUseCase', () => {
   it('should update task status to COMPLETED', async () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Title', 'Description', 'user-123')
+    const mockFindById = taskRepository.findById as jest.Mock
+    const mockSave = taskRepository.save as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
-    ;(taskRepository.save as jest.Mock).mockImplementation((t: TaskEntity) => t)
+    mockFindById.mockResolvedValue(task)
+    mockSave.mockImplementation((t: TaskEntity) => t)
 
     const result = await useCase.execute(taskId, { status: TaskStatusEnum.COMPLETED })
 
@@ -63,9 +69,11 @@ describe('UpdateTaskUseCase', () => {
   it('should update task status to IN_PROGRESS', async () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Title', 'Description', 'user-123')
+    const mockFindById = taskRepository.findById as jest.Mock
+    const mockSave = taskRepository.save as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
-    ;(taskRepository.save as jest.Mock).mockImplementation((t: TaskEntity) => t)
+    mockFindById.mockResolvedValue(task)
+    mockSave.mockImplementation((t: TaskEntity) => t)
 
     const result = await useCase.execute(taskId, { status: TaskStatusEnum.IN_PROGRESS })
 
@@ -77,8 +85,11 @@ describe('UpdateTaskUseCase', () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Title', 'Description', 'user-123')
     task.markAsCompleted()
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
-    ;(taskRepository.save as jest.Mock).mockImplementation((t: TaskEntity) => t)
+    const mockFindById = taskRepository.findById as jest.Mock
+    const mockSave = taskRepository.save as jest.Mock
+
+    mockFindById.mockResolvedValue(task)
+    mockSave.mockImplementation((t: TaskEntity) => t)
 
     const result = await useCase.execute(taskId, { status: TaskStatusEnum.TODO })
 
@@ -90,9 +101,11 @@ describe('UpdateTaskUseCase', () => {
   it('should update multiple fields at once', async () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Old Title', 'Old Description', 'user-123')
+    const mockFindById = taskRepository.findById as jest.Mock
+    const mockSave = taskRepository.save as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
-    ;(taskRepository.save as jest.Mock).mockImplementation((t: TaskEntity) => t)
+    mockFindById.mockResolvedValue(task)
+    mockSave.mockImplementation((t: TaskEntity) => t)
 
     const result = await useCase.execute(taskId, {
       title: 'New Title',
@@ -108,8 +121,9 @@ describe('UpdateTaskUseCase', () => {
 
   it('should throw NotFoundException when task does not exist', async () => {
     const taskId = 'non-existent-task'
+    const mockFindById = taskRepository.findById as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(null)
+    mockFindById.mockResolvedValue(null)
 
     await expect(useCase.execute(taskId, { title: 'New Title' })).rejects.toThrow(NotFoundException)
     await expect(useCase.execute(taskId, { title: 'New Title' })).rejects.toThrow('Task not found')
@@ -119,8 +133,9 @@ describe('UpdateTaskUseCase', () => {
   it('should throw error when title is invalid', async () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Title', 'Description', 'user-123')
+    const mockFindById = taskRepository.findById as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
+    mockFindById.mockResolvedValue(task)
 
     await expect(useCase.execute(taskId, { title: '' })).rejects.toThrow(
       'Task title cannot be empty'
