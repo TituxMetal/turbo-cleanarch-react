@@ -1,76 +1,138 @@
 import { TaskRepositoryPort } from '~/task/application/ports/task.repository'
 import { TaskEntity } from '~/task/domain/entities/task.entity'
+import { InMemoryTaskRepository } from '~/task/infrastructure/adapters/inMemoryTask.repository'
+
 import { ListTasksUseCase } from './listTasks.uc'
 
 describe('ListTasksUseCase', () => {
-  let useCase: ListTasksUseCase
+  let listTasksUseCase: ListTasksUseCase
   let taskRepository: TaskRepositoryPort
 
   beforeEach(() => {
-    taskRepository = {
-      save: jest.fn(),
-      findById: jest.fn(),
-      findByUserId: jest.fn(),
-      findAll: jest.fn(),
-      delete: jest.fn()
-    }
-
-    useCase = new ListTasksUseCase(taskRepository)
+    taskRepository = new InMemoryTaskRepository()
+    listTasksUseCase = new ListTasksUseCase(taskRepository)
   })
 
-  it('should return all tasks when no userId is provided', async () => {
-    const tasks = [
-      TaskEntity.create('Task 1', 'Description 1', 'user-1'),
-      TaskEntity.create('Task 2', 'Description 2', 'user-2')
-    ]
-    const mockFindAll = taskRepository.findAll as jest.Mock
+  describe('execute', () => {
+    it('should return an empty array when no tasks exist', async () => {
+      const result = await listTasksUseCase.execute()
 
-    mockFindAll.mockResolvedValue(tasks)
+      expect(result).toEqual([])
+    })
 
-    const result = await useCase.execute()
+    it('should return all tasks when no userId is provided', async () => {
+      const task1 = TaskEntity.create('Task 1', 'Description 1', 'user-1')
+      const task2 = TaskEntity.create('Task 2', 'Description 2', 'user-2')
 
-    expect(taskRepository.findAll).toHaveBeenCalled()
-    expect(taskRepository.findByUserId).not.toHaveBeenCalled()
-    expect(result).toBe(tasks)
-    expect(result).toHaveLength(2)
+      await taskRepository.save(task1)
+      await taskRepository.save(task2)
+
+      const result = await listTasksUseCase.execute()
+
+      expect(result).toHaveLength(2)
+      expect(result).toContain(task1)
+      expect(result).toContain(task2)
+    })
+
+    it('should return tasks for specific user when userId is provided', async () => {
+      const userId = 'user-123'
+      const task1 = TaskEntity.create('Task 1', 'Description 1', userId)
+      const task2 = TaskEntity.create('Task 2', 'Description 2', userId)
+      const task3 = TaskEntity.create('Task 3', 'Description 3', 'other-user')
+
+      await taskRepository.save(task1)
+      await taskRepository.save(task2)
+      await taskRepository.save(task3)
+
+      const result = await listTasksUseCase.execute(userId)
+
+      expect(result).toHaveLength(2)
+      expect(result).toContain(task1)
+      expect(result).toContain(task2)
+      expect(result).not.toContain(task3)
+    })
+
+    it('should return empty array when user has no tasks', async () => {
+      const task1 = TaskEntity.create('Task 1', 'Description 1', 'user-1')
+      await taskRepository.save(task1)
+
+      const result = await listTasksUseCase.execute('user-with-no-tasks')
+
+      expect(result).toEqual([])
+    })
+
+    it('should call repository findAll when no userId provided', async () => {
+      const findAllSpy = jest.spyOn(taskRepository, 'findAll')
+
+      await listTasksUseCase.execute()
+
+      expect(findAllSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should call repository findByUserId when userId provided', async () => {
+      const userId = 'user-123'
+      const findByUserIdSpy = jest.spyOn(taskRepository, 'findByUserId')
+
+      await listTasksUseCase.execute(userId)
+
+      expect(findByUserIdSpy).toHaveBeenCalledTimes(1)
+      expect(findByUserIdSpy).toHaveBeenCalledWith(userId)
+    })
+
+    it('should return tasks in the order they were saved', async () => {
+      const task1 = TaskEntity.create('First Task', 'Description 1', 'user-1')
+      const task2 = TaskEntity.create('Second Task', 'Description 2', 'user-2')
+      const task3 = TaskEntity.create('Third Task', 'Description 3', 'user-3')
+
+      await taskRepository.save(task1)
+      await taskRepository.save(task2)
+      await taskRepository.save(task3)
+
+      const result = await listTasksUseCase.execute()
+
+      expect(result[0].getTitle()).toBe('First Task')
+      expect(result[1].getTitle()).toBe('Second Task')
+      expect(result[2].getTitle()).toBe('Third Task')
+    })
+
+    it('should return multiple tasks for the same user', async () => {
+      const userId = 'user-123'
+      const task1 = TaskEntity.create('Task 1', 'Description 1', userId)
+      const task2 = TaskEntity.create('Task 2', 'Description 2', userId)
+      const task3 = TaskEntity.create('Task 3', 'Description 3', userId)
+
+      await taskRepository.save(task1)
+      await taskRepository.save(task2)
+      await taskRepository.save(task3)
+
+      const result = await listTasksUseCase.execute(userId)
+
+      expect(result).toHaveLength(3)
+      expect(result.every(task => task.getUserId().getValue() === userId)).toBe(true)
+    })
   })
 
-  it('should return tasks for specific user when userId is provided', async () => {
-    const userId = 'user-123'
-    const tasks = [
-      TaskEntity.create('Task 1', 'Description 1', userId),
-      TaskEntity.create('Task 2', 'Description 2', userId)
-    ]
-    const mockFindByUserId = taskRepository.findByUserId as jest.Mock
+  describe('error handling', () => {
+    it('should propagate repository findAll errors', async () => {
+      const errorMessage = 'Repository findAll operation failed'
+      const mockRepository = {
+        findAll: jest.fn().mockRejectedValue(new Error(errorMessage))
+      } as unknown as TaskRepositoryPort
 
-    mockFindByUserId.mockResolvedValue(tasks)
+      const useCase = new ListTasksUseCase(mockRepository)
 
-    const result = await useCase.execute(userId)
+      await expect(useCase.execute()).rejects.toThrow(errorMessage)
+    })
 
-    expect(taskRepository.findByUserId).toHaveBeenCalledWith(userId)
-    expect(taskRepository.findAll).not.toHaveBeenCalled()
-    expect(result).toBe(tasks)
-    expect(result).toHaveLength(2)
-  })
+    it('should propagate repository findByUserId errors', async () => {
+      const errorMessage = 'Repository findByUserId operation failed'
+      const mockRepository = {
+        findByUserId: jest.fn().mockRejectedValue(new Error(errorMessage))
+      } as unknown as TaskRepositoryPort
 
-  it('should return empty array when no tasks exist', async () => {
-    const mockFindAll = taskRepository.findAll as jest.Mock
+      const useCase = new ListTasksUseCase(mockRepository)
 
-    mockFindAll.mockResolvedValue([])
-
-    const result = await useCase.execute()
-
-    expect(result).toEqual([])
-  })
-
-  it('should return empty array when user has no tasks', async () => {
-    const userId = 'user-with-no-tasks'
-    const mockFindByUserId = taskRepository.findByUserId as jest.Mock
-
-    mockFindByUserId.mockResolvedValue([])
-
-    const result = await useCase.execute(userId)
-
-    expect(result).toEqual([])
+      await expect(useCase.execute('user-123')).rejects.toThrow(errorMessage)
+    })
   })
 })
