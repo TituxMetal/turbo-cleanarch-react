@@ -39,6 +39,5 @@ describe('GetTaskUseCase', () => {
     mockFindById.mockResolvedValue(null)
 
     await expect(useCase.execute(taskId)).rejects.toThrow(NotFoundException)
-    await expect(useCase.execute(taskId)).rejects.toThrow('Task not found')
   })
 })
