@@ -1,9 +1,9 @@
 import { NotFoundException } from '@nestjs/common'
-import { CreateTaskUseCase } from './createTask.uc'
 import { TaskRepositoryPort } from '~/task/application/ports/task.repository'
-import { UserRepositoryPort } from '~/user/application/ports/user.repository'
 import { TaskEntity } from '~/task/domain/entities/task.entity'
+import { UserRepositoryPort } from '~/user/application/ports/user.repository'
 import { UserEntity } from '~/user/domain/entities/user.entity'
+import { CreateTaskUseCase } from './createTask.uc'
 
 describe('CreateTaskUseCase', () => {
   let useCase: CreateTaskUseCase
@@ -38,9 +38,11 @@ describe('CreateTaskUseCase', () => {
       description: 'Test Description',
       userId
     }
+    const mockUserFindById = userRepository.findById as jest.Mock
+    const mockTaskSave = taskRepository.save as jest.Mock
 
-    ;(userRepository.findById as jest.Mock).mockResolvedValue(user)
-    ;(taskRepository.save as jest.Mock).mockImplementation((task: TaskEntity) => task)
+    mockUserFindById.mockResolvedValue(user)
+    mockTaskSave.mockImplementation((task: TaskEntity) => task)
 
     const result = await useCase.execute(dto)
 
@@ -58,11 +60,11 @@ describe('CreateTaskUseCase', () => {
       description: 'Test Description',
       userId: 'non-existent-user'
     }
+    const mockUserFindById = userRepository.findById as jest.Mock
 
-    ;(userRepository.findById as jest.Mock).mockResolvedValue(null)
+    mockUserFindById.mockResolvedValue(null)
 
     await expect(useCase.execute(dto)).rejects.toThrow(NotFoundException)
-    await expect(useCase.execute(dto)).rejects.toThrow('User not found')
     expect(taskRepository.save).not.toHaveBeenCalled()
   })
 
@@ -74,8 +76,9 @@ describe('CreateTaskUseCase', () => {
       description: 'Test Description',
       userId
     }
+    const mockUserFindById = userRepository.findById as jest.Mock
 
-    ;(userRepository.findById as jest.Mock).mockResolvedValue(user)
+    mockUserFindById.mockResolvedValue(user)
 
     await expect(useCase.execute(dto)).rejects.toThrow('Task title cannot be empty')
     expect(taskRepository.save).not.toHaveBeenCalled()

@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 
 import { CreateUserUseCase } from '~/user/application/use-cases/createUser.uc'
 import { GetUserUseCase } from '~/user/application/use-cases/getUser.uc'
-import { ListUsersUseCase } from '~/user/application/use-cases/listUsers.us'
+import { ListUsersUseCase } from '~/user/application/use-cases/listUsers.uc'
 import { UpdateUserUseCase } from '~/user/application/use-cases/updateUser.uc'
 import { UserEntity } from '~/user/domain/entities/user.entity'
 
@@ -91,9 +91,7 @@ describe('UserController', () => {
 
     it('should propagate ConflictException', async () => {
       const createUserDto = { name: 'John Doe', email: 'john@example.com' }
-      createUserUseCase.execute.mockRejectedValue(
-        new ConflictException('User with this email already exists')
-      )
+      createUserUseCase.execute.mockRejectedValue(new ConflictException())
 
       await expect(controller.createUser(createUserDto)).rejects.toThrow(ConflictException)
     })

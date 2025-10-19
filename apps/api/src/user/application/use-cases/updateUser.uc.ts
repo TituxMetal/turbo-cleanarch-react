@@ -18,7 +18,7 @@ export class UpdateUserUseCase {
     const user = await this.userRepository.findById(id)
 
     if (!user) {
-      throw new NotFoundException('User not found')
+      throw new NotFoundException('User not found', 'USER_NOT_FOUND')
     }
 
     if (dto.name !== undefined) {

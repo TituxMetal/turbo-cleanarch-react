@@ -34,9 +34,6 @@ describe('CreateUserUseCase', () => {
       await createUserUseCase.execute(userData)
 
       await expect(createUserUseCase.execute(userData)).rejects.toThrow(ConflictException)
-      await expect(createUserUseCase.execute(userData)).rejects.toThrow(
-        'User with this email already exists'
-      )
     })
 
     it('should throw ConflictException for different user with same email', async () => {

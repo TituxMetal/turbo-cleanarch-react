@@ -193,7 +193,245 @@ curl -X PUT http://localhost:3000/users/a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2 \
   -d '{"email": "jane.smith@example.com"}' | jq
 ```
 
+### Task Management
+
+#### Create Task
+
+Creates a new task for a user.
+
+**Endpoint:** `POST /tasks`
+
+**Request Body:**
+
+```json
+{
+  "title": "Complete project documentation",
+  "description": "Write comprehensive API documentation",
+  "userId": "a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "b7ef6c12-4a2d-4e8f-9c5d-1234567890ab",
+  "title": "Complete project documentation",
+  "description": "Write comprehensive API documentation",
+  "status": "TODO",
+  "userId": "a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2",
+  "createdAt": "2025-10-19T08:30:00.000Z",
+  "updatedAt": "2025-10-19T08:30:00.000Z",
+  "completedAt": null
+}
+```
+
+**cURL Example:**
+
+```bash
+curl -X POST http://localhost:3000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Complete project documentation",
+    "description": "Write comprehensive API documentation",
+    "userId": "a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2"
+  }' | jq
+```
+
+#### Get All Tasks
+
+Retrieves a list of all tasks, optionally filtered by user.
+
+**Endpoint:** `GET /tasks`
+
+**Query Parameters:**
+
+- `userId` (optional, string): Filter tasks by user ID
+
+**Response:**
+
+```json
+[
+  {
+    "id": "b7ef6c12-4a2d-4e8f-9c5d-1234567890ab",
+    "title": "Complete project documentation",
+    "description": "Write comprehensive API documentation",
+    "status": "TODO",
+    "userId": "a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2",
+    "createdAt": "2025-10-19T08:30:00.000Z",
+    "updatedAt": "2025-10-19T08:30:00.000Z",
+    "completedAt": null
+  }
+]
+```
+
+**cURL Examples:**
+
+Get all tasks:
+
+```bash
+curl -X GET http://localhost:3000/tasks | jq
+```
+
+Get tasks for specific user:
+
+```bash
+curl -X GET "http://localhost:3000/tasks?userId=a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2" | jq
+```
+
+#### Get Task by ID
+
+Retrieves a specific task by its ID.
+
+**Endpoint:** `GET /tasks/:id`
+
+**Parameters:**
+
+- `id` (string): The unique identifier of the task
+
+**Response:**
+
+```json
+{
+  "id": "b7ef6c12-4a2d-4e8f-9c5d-1234567890ab",
+  "title": "Complete project documentation",
+  "description": "Write comprehensive API documentation",
+  "status": "TODO",
+  "userId": "a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2",
+  "createdAt": "2025-10-19T08:30:00.000Z",
+  "updatedAt": "2025-10-19T08:30:00.000Z",
+  "completedAt": null
+}
+```
+
+**cURL Example:**
+
+```bash
+curl -X GET http://localhost:3000/tasks/b7ef6c12-4a2d-4e8f-9c5d-1234567890ab | jq
+```
+
+#### Update Task
+
+Updates an existing task's information.
+
+**Endpoint:** `PUT /tasks/:id`
+
+**Parameters:**
+
+- `id` (string): The unique identifier of the task
+
+**Request Body:**
+
+```json
+{
+  "title": "Complete API documentation",
+  "description": "Write comprehensive API documentation with examples",
+  "status": "IN_PROGRESS"
+}
+```
+
+_Note: All fields are optional. You can update any combination of fields._
+
+**Valid Status Values:**
+
+- `TODO`: Task not started
+- `IN_PROGRESS`: Task is being worked on
+- `COMPLETED`: Task is finished
+
+**Response:**
+
+```json
+{
+  "id": "b7ef6c12-4a2d-4e8f-9c5d-1234567890ab",
+  "title": "Complete API documentation",
+  "description": "Write comprehensive API documentation with examples",
+  "status": "IN_PROGRESS",
+  "userId": "a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2",
+  "createdAt": "2025-10-19T08:30:00.000Z",
+  "updatedAt": "2025-10-19T08:35:00.000Z",
+  "completedAt": null
+}
+```
+
+**cURL Examples:**
+
+Update multiple fields:
+
+```bash
+curl -X PUT http://localhost:3000/tasks/b7ef6c12-4a2d-4e8f-9c5d-1234567890ab \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Complete API documentation",
+    "status": "IN_PROGRESS"
+  }' | jq
+```
+
+Update only status:
+
+```bash
+curl -X PUT http://localhost:3000/tasks/b7ef6c12-4a2d-4e8f-9c5d-1234567890ab \
+  -H "Content-Type: application/json" \
+  -d '{"status": "COMPLETED"}' | jq
+```
+
+#### Mark Task as Complete
+
+Convenience endpoint to mark a task as completed.
+
+**Endpoint:** `PATCH /tasks/:id/complete`
+
+**Parameters:**
+
+- `id` (string): The unique identifier of the task
+
+**Response:**
+
+```json
+{
+  "id": "b7ef6c12-4a2d-4e8f-9c5d-1234567890ab",
+  "title": "Complete API documentation",
+  "description": "Write comprehensive API documentation with examples",
+  "status": "COMPLETED",
+  "userId": "a3dc5fa0-9d38-43ef-87bb-9adc8572cfa2",
+  "createdAt": "2025-10-19T08:30:00.000Z",
+  "updatedAt": "2025-10-19T08:40:00.000Z",
+  "completedAt": "2025-10-19T08:40:00.000Z"
+}
+```
+
+**cURL Example:**
+
+```bash
+curl -X PATCH http://localhost:3000/tasks/b7ef6c12-4a2d-4e8f-9c5d-1234567890ab/complete | jq
+```
+
+#### Delete Task
+
+Deletes a task from the system.
+
+**Endpoint:** `DELETE /tasks/:id`
+
+**Parameters:**
+
+- `id` (string): The unique identifier of the task
+
+**Response:**
+
+```json
+{
+  "message": "Task deleted successfully"
+}
+```
+
+**cURL Example:**
+
+```bash
+curl -X DELETE http://localhost:3000/tasks/b7ef6c12-4a2d-4e8f-9c5d-1234567890ab | jq
+```
+
 ## Response Format
+
+### User Object
 
 All user endpoints return user objects with the following structure:
 
@@ -205,6 +443,21 @@ All user endpoints return user objects with the following structure:
 | `createdAt`  | string | ISO 8601 timestamp of creation    |
 | `updatedAt`  | string | ISO 8601 timestamp of last update |
 | `accountAge` | number | Age of the account in days        |
+
+### Task Object
+
+All task endpoints return task objects with the following structure:
+
+| Field         | Type         | Description                                   |
+| ------------- | ------------ | --------------------------------------------- |
+| `id`          | string       | Unique identifier (UUID)                      |
+| `title`       | string       | Task title (1-200 characters)                 |
+| `description` | string       | Task description (max 2000 characters)        |
+| `status`      | string       | Current status (TODO, IN_PROGRESS, COMPLETED) |
+| `userId`      | string       | ID of the user who owns this task             |
+| `createdAt`   | string       | ISO 8601 timestamp of creation                |
+| `updatedAt`   | string       | ISO 8601 timestamp of last update             |
+| `completedAt` | string\|null | ISO 8601 timestamp when marked complete       |
 
 ## Error Handling
 
@@ -235,6 +488,9 @@ The API returns appropriate HTTP status codes:
 
 ```text
 src/
+├── common/
+│   └── filters/
+│       └── httpException.filter.ts    # Global HTTP exception filter
 ├── user/
 │   ├── application/
 │   │   ├── ports/
@@ -242,8 +498,9 @@ src/
 │   │   └── use-cases/
 │   │       ├── createUser.uc.ts        # Create user use case
 │   │       ├── getUser.uc.ts           # Get user by ID use case
-│   │       ├── listUsers.us.ts         # List users use case
-│   │       └── updateUser.uc.ts        # Update user use case
+│   │       ├── listUsers.uc.ts         # List users use case
+│   │       ├── updateUser.uc.ts        # Update user use case
+│   │       └── deleteUser.uc.ts        # Delete user use case
 │   ├── domain/
 │   │   ├── entities/
 │   │   │   └── user.entity.ts          # User domain entity
@@ -253,7 +510,31 @@ src/
 │   ├── infrastructure/
 │   │   └── adapters/
 │   │       └── inMemoryUser.repository.ts  # In-memory implementation
-│   └── presentation/
-│       └── user.controller.ts          # HTTP controllers
+│   ├── presentation/
+│   │   └── user.controller.ts          # HTTP controllers
+│   └── user.module.ts                  # User module
+├── task/
+│   ├── application/
+│   │   ├── ports/
+│   │   │   └── task.repository.ts      # Repository interface
+│   │   └── use-cases/
+│   │       ├── createTask.uc.ts        # Create task use case
+│   │       ├── getTask.uc.ts           # Get task by ID use case
+│   │       ├── listTasks.uc.ts         # List tasks use case
+│   │       ├── updateTask.uc.ts        # Update task use case
+│   │       └── deleteTask.uc.ts        # Delete task use case
+│   ├── domain/
+│   │   ├── entities/
+│   │   │   └── task.entity.ts          # Task domain entity
+│   │   └── value-objects/
+│   │       ├── taskId.vo.ts            # Task ID value object
+│   │       └── taskStatus.vo.ts        # Task status value object
+│   ├── infrastructure/
+│   │   └── adapters/
+│   │       └── inMemoryTask.repository.ts  # In-memory implementation
+│   ├── presentation/
+│   │   └── task.controller.ts          # HTTP controllers
+│   └── task.module.ts                  # Task module
+├── main.ts                             # Application entry point
 └── app.module.ts                       # Main application module
 ```

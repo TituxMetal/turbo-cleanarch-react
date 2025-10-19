@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 
 import { CreateUserDto, CreateUserUseCase } from '~/user/application/use-cases/createUser.uc'
 import { GetUserUseCase } from '~/user/application/use-cases/getUser.uc'
-import { ListUsersUseCase } from '~/user/application/use-cases/listUsers.us'
+import { ListUsersUseCase } from '~/user/application/use-cases/listUsers.uc'
 import { UpdateUserDto, UpdateUserUseCase } from '~/user/application/use-cases/updateUser.uc'
 import { UserEntity } from '~/user/domain/entities/user.entity'
 

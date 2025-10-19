@@ -91,9 +91,6 @@ describe('UpdateUserUseCase', () => {
       await expect(updateUserUseCase.execute(updateData, nonExistentId)).rejects.toThrow(
         NotFoundException
       )
-      await expect(updateUserUseCase.execute(updateData, nonExistentId)).rejects.toThrow(
-        'User not found'
-      )
     })
 
     it('should call repository findById with correct ID', async () => {

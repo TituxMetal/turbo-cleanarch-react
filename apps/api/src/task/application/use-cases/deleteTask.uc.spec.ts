@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common'
-import { DeleteTaskUseCase } from './deleteTask.uc'
 import { TaskRepositoryPort } from '~/task/application/ports/task.repository'
 import { TaskEntity } from '~/task/domain/entities/task.entity'
+import { DeleteTaskUseCase } from './deleteTask.uc'
 
 describe('DeleteTaskUseCase', () => {
   let useCase: DeleteTaskUseCase
@@ -22,9 +22,11 @@ describe('DeleteTaskUseCase', () => {
   it('should delete task when it exists', async () => {
     const taskId = 'task-123'
     const task = TaskEntity.create('Test Task', 'Test Description', 'user-123')
+    const mockFindById = taskRepository.findById as jest.Mock
+    const mockDelete = taskRepository.delete as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(task)
-    ;(taskRepository.delete as jest.Mock).mockResolvedValue(undefined)
+    mockFindById.mockResolvedValue(task)
+    mockDelete.mockResolvedValue(undefined)
 
     await useCase.execute(taskId)
 
@@ -34,8 +36,9 @@ describe('DeleteTaskUseCase', () => {
 
   it('should throw NotFoundException when task does not exist', async () => {
     const taskId = 'non-existent-task'
+    const mockFindById = taskRepository.findById as jest.Mock
 
-    ;(taskRepository.findById as jest.Mock).mockResolvedValue(null)
+    mockFindById.mockResolvedValue(null)
 
     await expect(useCase.execute(taskId)).rejects.toThrow(NotFoundException)
     await expect(useCase.execute(taskId)).rejects.toThrow('Task not found')
