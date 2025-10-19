@@ -153,4 +153,41 @@ describe('User API (e2e)', () => {
         .expect(500)
     })
   })
+
+  describe('/users/:id (DELETE)', () => {
+    it('should delete a user successfully', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send({ name: 'User To Delete', email: 'delete1@example.com' })
+        .expect(201)
+
+      const userToDeleteId = response.body.id
+
+      return request(app.getHttpServer())
+        .delete(`/users/${userToDeleteId}`)
+        .expect(200)
+        .expect({ message: 'User deleted successfully' })
+    })
+
+    it('should return 404 when deleting non-existent user', () => {
+      return request(app.getHttpServer()).delete('/users/non-existent-id').expect(404)
+    })
+
+    it('should return 404 when getting deleted user', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send({ name: 'User To Delete', email: 'delete2@example.com' })
+        .expect(201)
+
+      const userToDeleteId = response.body.id
+
+      await request(app.getHttpServer()).delete(`/users/${userToDeleteId}`).expect(200)
+
+      return request(app.getHttpServer()).get(`/users/${userToDeleteId}`).expect(404)
+    })
+
+    it('should return 404 when deleting with empty id', () => {
+      return request(app.getHttpServer()).delete('/users/').expect(404)
+    })
+  })
 })

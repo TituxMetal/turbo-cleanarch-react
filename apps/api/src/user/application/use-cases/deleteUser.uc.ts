@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 
 import { USER_REPOSITORY, UserRepositoryPort } from '~/user/application/ports/user.repository'
 
@@ -9,7 +9,11 @@ export class DeleteUserUseCase {
     private readonly userRepository: UserRepositoryPort
   ) {}
 
-  async execute(id: string) {
+  async execute(id: string): Promise<void> {
+    const user = await this.userRepository.findById(id)
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
     await this.userRepository.delete(id)
   }
 }
