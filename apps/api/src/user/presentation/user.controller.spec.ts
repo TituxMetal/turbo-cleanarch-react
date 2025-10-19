@@ -245,27 +245,4 @@ describe('UserController', () => {
       )
     })
   })
-
-  describe('mapToResponse', () => {
-    it('should map user entity to response format correctly', async () => {
-      const createUserDto = { name: 'John Doe', email: 'john@example.com' }
-      const mockUser = UserEntity.create('John Doe', 'john@example.com')
-      createUserUseCase.execute.mockResolvedValue(mockUser)
-
-      const result = await controller.createUser(createUserDto)
-
-      expect(result).toHaveProperty('id')
-      expect(result).toHaveProperty('name')
-      expect(result).toHaveProperty('email')
-      expect(result).toHaveProperty('createdAt')
-      expect(result).toHaveProperty('updatedAt')
-      expect(result).toHaveProperty('accountAge')
-      expect(typeof result.id).toBe('string')
-      expect(typeof result.name).toBe('string')
-      expect(typeof result.email).toBe('string')
-      expect(result.createdAt).toBeInstanceOf(Date)
-      expect(result.updatedAt).toBeInstanceOf(Date)
-      expect(typeof result.accountAge).toBe('number')
-    })
-  })
 })

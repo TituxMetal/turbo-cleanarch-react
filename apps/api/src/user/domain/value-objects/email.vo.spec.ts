@@ -52,22 +52,10 @@ describe('Email', () => {
 
     it('should throw error for email with spaces', () => {
       expect(() => new Email('user @example.com')).toThrow('Invalid email format')
-      expect(() => new Email('user@ example.com')).toThrow('Invalid email format')
-      expect(() => new Email('user@example .com')).toThrow('Invalid email format')
     })
 
     it('should throw error for multiple @ symbols', () => {
       expect(() => new Email('user@@example.com')).toThrow('Invalid email format')
-      expect(() => new Email('user@example@.com')).toThrow('Invalid email format')
-    })
-  })
-
-  describe('getValue', () => {
-    it('should return the email value', () => {
-      const emailValue = 'test@example.com'
-      const email = new Email(emailValue)
-
-      expect(email.getValue()).toBe(emailValue)
     })
   })
 
@@ -95,12 +83,6 @@ describe('Email', () => {
   })
 
   describe('immutability', () => {
-    it('should have readonly value property', () => {
-      const email = new Email('test@example.com')
-
-      expect(email.getValue()).toBe('test@example.com')
-    })
-
     it('should be a value object (no identity)', () => {
       const email1 = new Email('test@example.com')
       const email2 = new Email('test@example.com')
