@@ -32,16 +32,18 @@ export class UpdateTaskUseCase {
       task.updateDescription(dto.description)
     }
 
-    if (dto.status === TaskStatusEnum.COMPLETED) {
-      task.markAsCompleted()
-    }
-
-    if (dto.status === TaskStatusEnum.IN_PROGRESS) {
-      task.markAsInProgress()
-    }
-
-    if (dto.status === TaskStatusEnum.TODO) {
-      task.markAsTodo()
+    if (dto.status !== undefined) {
+      switch (dto.status) {
+        case TaskStatusEnum.COMPLETED:
+          task.markAsCompleted()
+          break
+        case TaskStatusEnum.IN_PROGRESS:
+          task.markAsInProgress()
+          break
+        case TaskStatusEnum.TODO:
+          task.markAsTodo()
+          break
+      }
     }
 
     return this.taskRepository.save(task)
