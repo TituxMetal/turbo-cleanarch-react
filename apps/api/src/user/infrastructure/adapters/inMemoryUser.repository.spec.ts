@@ -131,7 +131,6 @@ describe('InMemoryUserRepository', () => {
       const users = await repository.findAll()
 
       expect(users).toEqual([])
-      expect(users).toHaveLength(0)
     })
 
     it('should return all users', async () => {

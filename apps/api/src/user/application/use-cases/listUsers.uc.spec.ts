@@ -18,8 +18,6 @@ describe('ListUsersUseCase', () => {
       const result = await listUsersUseCase.execute()
 
       expect(result).toEqual([])
-      expect(result).toHaveLength(0)
-      expect(Array.isArray(result)).toBe(true)
     })
 
     it('should return an array with one user when one user exists', async () => {
